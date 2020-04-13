@@ -49,7 +49,7 @@ func (mux *ServeMux) match(q string, t uint16) Handler {
 	}
 
 	// Wildcard match, if we have found nothing try the root zone as a last resort.
-	if h, ok := mux.z["."]; ok {
+	if h, ok := mux.z["*."+q]; ok {
 		return h
 	}
 
