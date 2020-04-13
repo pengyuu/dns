@@ -41,17 +41,21 @@ func (mux *ServeMux) match(q string, t uint16) Handler {
 	for off, end := 0, false; !end; off, end = NextLabel(q, off) {
 
 		if h, ok := mux.z[q[off:]]; ok {
+			if q[off:] != q {
+				if fh, fok := mux.z["*."+q[off:]]; fok {
+					if t != TypeDS {
+						return fh
+					}
+					// Continue for DS to see if we have a parent too, if so delegate to the parent
+					handler = fh
+				}
+			}
+
 			if t != TypeDS {
 				return h
 			}
 			// Continue for DS to see if we have a parent too, if so delegate to the parent
 			handler = h
-		} else if fh, fok := mux.z["*."+q[off:]]; fok {
-			if t != TypeDS {
-				return fh
-			}
-			// Continue for DS to see if we have a parent too, if so delegate to the parent
-			handler = fh
 		}
 	}
 
