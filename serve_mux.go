@@ -39,19 +39,22 @@ func (mux *ServeMux) match(q string, t uint16) Handler {
 
 	var handler Handler
 	for off, end := 0, false; !end; off, end = NextLabel(q, off) {
+
 		if h, ok := mux.z[q[off:]]; ok {
 			if t != TypeDS {
 				return h
 			}
 			// Continue for DS to see if we have a parent too, if so delegate to the parent
 			handler = h
+		} else if fh, fok := mux.z["*."+q[off:]]; fok {
+			if t != TypeDS {
+				return fh
+			}
+			// Continue for DS to see if we have a parent too, if so delegate to the parent
+			handler = fh
 		}
 	}
 
-	// *域名匹配
-	if h, ok := mux.z["*."+q]; ok {
-		return h
-	}
 	// Wildcard match, if we have found nothing try the root zone as a last resort.
 	if h, ok := mux.z["."]; ok {
 		return h
