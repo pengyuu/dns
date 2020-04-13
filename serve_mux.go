@@ -48,8 +48,12 @@ func (mux *ServeMux) match(q string, t uint16) Handler {
 		}
 	}
 
-	// Wildcard match, if we have found nothing try the root zone as a last resort.
+	// *域名匹配
 	if h, ok := mux.z["*."+q]; ok {
+		return h
+	}
+	// Wildcard match, if we have found nothing try the root zone as a last resort.
+	if h, ok := mux.z["."]; ok {
 		return h
 	}
 
