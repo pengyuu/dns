@@ -1,6 +1,7 @@
 package dns
 
 import (
+	"strings"
 	"sync"
 )
 
@@ -107,7 +108,7 @@ func (mux *ServeMux) HandleRemove(pattern string) {
 func (mux *ServeMux) ServeDNS(w ResponseWriter, req *Msg) {
 	var h Handler
 	if len(req.Question) >= 1 { // allow more than one question
-		h = mux.match(req.Question[0].Name, req.Question[0].Qtype)
+		h = mux.match(strings.ToLower(req.Question[0].Name), req.Question[0].Qtype)
 	}
 
 	if h != nil {
